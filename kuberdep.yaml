@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evershop-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: evershop
+  template:
+    metadata:
+      labels:
+        app: evershop
+    spec:
+      containers:
+      - name: evershop
+        image: evershop:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_HOST
+          value: postgres-service
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          value: postgres
+        - name: DB_PASSWORD
+          value: Km979057
+        - name: DB_NAME
+          value: evershop1
+        - name: BIND_ADDRESS
+          value: "0.0.0.0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evershop-service
+spec:
+  selector:
+    app: evershop
+  ports:
+  - port: 3002
+    targetPort: 3000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:14
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          value: Km979057
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_DB
+          value: evershop1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
