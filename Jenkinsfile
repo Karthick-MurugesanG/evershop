@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        CONTAINER_NAME = "evershop-app"
-        IMAGE_NAME = "your-dockerhub-username/evershop"
+        CONTAINER_NAME = "evershop"
+        IMAGE_NAME = "karthickmurugesang/evershop"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-repo/evershop.git'
+                git branch: 'main', url: 'https://github.com/Karthick-MurugesanG/evershop.git'
             }
         }
 
