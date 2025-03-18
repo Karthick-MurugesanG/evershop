@@ -11,5 +11,4 @@ jobs:
     steps:
       - name: Trigger Jenkins Job
         run: |
-          curl -X POST "http://your-private-jenkins:8080/job/EverShop-Auto-Deploy/build" \
-          --user "karthick-murugesang:${{ secrets.JENKINS_TOKEN }}"
+          curl -X POST "http://your-private-jenkins:8080/job/EverShop-Auto-Deploy/buildWithParameters?token=evershop-deploy-token"
