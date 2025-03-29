@@ -2,50 +2,47 @@ pipeline {
     agent any
 
     environment {
-        CONTAINER_NAME = "evershop"
-        IMAGE_NAME = "karthickmurugesang/evershop"
+        DOCKER_IMAGE = "karthickmurugesang/evershop"
+        K8S_DEPLOYMENT = "evershop-deployment"
+        K8S_NAMESPACE = "default"
+        CONTAINER_NAME = "evershop" // Ensure this matches the actual container name
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/Karthick-MurugesanG/evershop.git'
+                git branch: 'main', credentialsId: '8dba1cbd-f6e3-4939-920a-31c9ded5184f', url: 'https://github.com/karthick-murugesang/evershop.git'
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                sh "docker pull node:18-alpine"
+                sh "docker build -t $DOCKER_IMAGE:latest ."
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withDockerRegistry([credentialsId: 'a053b7e4-06a0-4c49-935e-e38545937695', url: 'https://index.docker.io/v1/']) {
+                    sh "docker push karthickmurugesang/evershop:latest --quiet"
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Deploy to Kubernetes') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
-                    sh "docker push ${IMAGE_NAME}:latest"
-                }
-            }
-        }
-
-        stage('Deploy Container') {
-            steps {
-                script {
-                    sh "docker stop ${CONTAINER_NAME} || true"
-                    sh "docker rm ${CONTAINER_NAME} || true"
-                    sh "docker run -d --name ${CONTAINER_NAME} -p 3008:3001 ${IMAGE_NAME}:latest"
-                }
+                sh "kubectl set image deployment/$K8S_DEPLOYMENT $CONTAINER_NAME=$DOCKER_IMAGE:latest -n $K8S_NAMESPACE"
             }
         }
     }
 
     post {
         success {
-            echo "Deployment Successful!"
+            echo 'Deployment Successful!'
         }
         failure {
-            echo "Deployment Failed!"
+            echo 'Deployment Failed!'
         }
     }
 }
