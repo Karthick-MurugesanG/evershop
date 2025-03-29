@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', credentialsId: '8dba1cbd-f6e3-4939-920a-31c9ded5184f', url: 'https://github.com/karthick-murugesang/evershop.git'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/karthick-murugesang/evershop.git'
             }
         }
 
@@ -24,7 +24,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'a053b7e4-06a0-4c49-935e-e38545937695', url: 'https://index.docker.io/v1/']) {
+                withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
                     sh "docker push karthickmurugesang/evershop:latest --quiet"
                 }
             }
