@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: evershop
-        image: evershop:latest
+        image: karthickmurugesang/evershop:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
