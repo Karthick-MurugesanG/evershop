@@ -26,7 +26,7 @@ spec:
         - name: DB_USER
           value: postgres
         - name: DB_PASSWORD
-          value: Km979057
+          value: ${{ secrets.DATABASE_PASSWORD }}
         - name: DB_NAME
           value: evershop1
         - name: BIND_ADDRESS
@@ -66,7 +66,7 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_PASSWORD
-          value: Km979057
+          value: ${{ secrets.DATABASE_PASSWORD }}
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_DB
