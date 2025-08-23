@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GIT_REPO='https://github.co,/Karthick-MurugesanG/evershop.git'
+        GIT_REPO='https://github.com/Karthick-MurugesanG/evershop.git'
         IMAGE_NAME = 'karthickmurugesang/evershop'
         IMAGE_TAG='latest'
         K8S_DEPLOYMENT = 'kuberdep.yaml'
