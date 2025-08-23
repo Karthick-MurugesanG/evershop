@@ -2,37 +2,41 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "karthickmurugesang/evershop"
-        K8S_DEPLOYMENT = "evershop-deployment"
-        K8S_NAMESPACE = "default"
-        CONTAINER_NAME = "evershop" // Ensure this matches the actual container name
+        GIT_REPO='https://github.co,/Karthick-MurugesanG/evershop.git'
+        IMAGE_NAME = 'karthickmurugesang/evershop'
+        IMAGE_TAG='latest'
+        K8S_DEPLOYMENT = 'kuberdep.yaml'
+        DOCKER_CREDENTIALS_ID='docker'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/karthick-murugesang/evershop.git'
+                git url: "${env.GIT_REPO}", branch: 'main'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker pull node:18-alpine"
-                sh "docker build -t $DOCKER_IMAGE:latest ."
+                script {
+                    dockerImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}") 
+                }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                withDockerRegistry([credentialsId: 'docker', url: 'https://index.docker.io/v1/']) {
-                    sh "docker push karthickmurugesang/evershop:latest --quiet"
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID){
+                        dockerImage.push()
+                    }
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh "kubectl set image deployment/$K8S_DEPLOYMENT $CONTAINER_NAME=$DOCKER_IMAGE:latest -n $K8S_NAMESPACE"
+                sh "kubectl apply -f ${K8S_DEPLOYMENT}"
             }
         }
     }
