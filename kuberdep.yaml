@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: evershop-deployment
+  namespace: jenkins
 spec:
   replicas: 1
   selector:
@@ -26,7 +27,10 @@ spec:
         - name: DB_USER
           value: postgres
         - name: DB_PASSWORD
-          value: ${{ secrets.DATABASE_PASSWORD }}
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: DATABASE_PASSWORD
         - name: DB_NAME
           value: evershop1
         - name: BIND_ADDRESS
@@ -36,6 +40,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: evershop-service
+  namespace: jenkins
 spec:
   selector:
     app: evershop
@@ -48,6 +53,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-deployment
+  namespace: jenkins
 spec:
   replicas: 1
   selector:
@@ -61,12 +67,15 @@ spec:
       containers:
       - name: postgres
         image: postgres:14
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
         env:
         - name: POSTGRES_PASSWORD
-          value: ${{ secrets.DATABASE_PASSWORD }}
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: DATABASE_PASSWORD
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_DB
@@ -76,6 +85,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
+  namespace: jenkins
 spec:
   selector:
     app: postgres
