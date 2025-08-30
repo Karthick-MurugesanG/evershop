@@ -27,10 +27,7 @@ spec:
         - name: DB_USER
           value: postgres
         - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-secret
-              key: DATABASE_PASSWORD
+          value: Km979057@
         - name: DB_NAME
           value: evershop1
         - name: BIND_ADDRESS
